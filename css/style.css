@@ -1,0 +1,123 @@
+* { margin: 0; padding: 0; font-size: 17px; font-family: Arial, sans-serif;
+
+    --color0: #F2E416;
+    --color1: #F2B705;
+    --color2: #F29F05;
+    --color3: #F28705;
+    --color4: #F25C05;
+
+    --color5: #ffdbc6;
+    
+    --white: #f0f0f0;
+    --black: #0d0d0d;
+}
+
+body {
+    background-color: var(--color3);
+    overflow: hidden;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+nav .anchors {
+    list-style-type: none;
+}
+
+nav .anchors {
+    display: flex;
+}
+
+nav .anchors a {
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+nav .anchors a:hover {
+    color: var(--color1);
+    transition: 200ms;
+}
+
+nav .anchors a,
+h1.title {
+    color: var(--color5);
+}
+
+h1.title {
+    font-size: 1.5rem;
+}
+
+main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+main section.video-visualizer {
+    background-color: var(--color5);
+    padding: 15px;
+    box-shadow: 15px 15px black;
+}
+
+main div.temp-mark-wrapper {
+    position: absolute;
+    top: 10px;
+}
+
+main div.temp-mark-content {
+    width: 220px;
+    height: 150px;
+    background-color: #ffdbc6bd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px;
+    padding: 10px;
+    position: relative;
+}
+
+main div.temp-mark-content::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 15px solid #ffdbc6bd;
+    bottom: -14.5px;
+
+}
+
+main div.temp-mark-content img {
+    width: inherit;
+    height: inherit;
+}
+
+section.video-visualizer input.temp-button {
+    padding: 15px 25px;
+    background-color: var(--color3);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+    header, 
+    header nav > ul.anchors {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    ul.anchors li {
+        display: flex;
+        justify-content: center;   
+    }
+}
