@@ -1,8 +1,8 @@
-export { 
-    AnimationsManager, 
+export {
+    AnimationsManager,
     CustomFrame,
     Mark,
-    VideoDetails    
+    VideoDetails
 }
 
 const AnimationsManager = (function() {
@@ -20,7 +20,7 @@ const AnimationsManager = (function() {
             animations.length = 0
             resolve({ finished: true })
         })
-        
+
         return promise
     }
 })
@@ -34,16 +34,16 @@ const Mark = (function Mark() {
 
     const tempMarkWrapper = document.createElement('div')
     tempMarkWrapper.classList.add('temp-mark-wrapper')
-    
+
     const tempMarkWrapperStyle = tempMarkWrapper.style
     tempMarkWrapperStyle.setProperty('position', 'absolute')
-    
+
     const tempMarkContent = document.createElement('div')
     tempMarkContent.classList.add('temp-mark-content')
 
     const img = new Image()
     img.classList.add('mark-curr-image')
-    
+
     tempMarkContent.appendChild(img)
     tempMarkWrapper.appendChild(tempMarkContent)
 

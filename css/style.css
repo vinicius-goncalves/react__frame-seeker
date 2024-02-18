@@ -7,7 +7,7 @@
     --color4: #F25C05;
 
     --color5: #ffdbc6;
-    
+
     --white: #f0f0f0;
     --black: #0d0d0d;
 }
@@ -69,6 +69,7 @@ main section.video-visualizer {
 main div.temp-mark-wrapper {
     position: absolute;
     top: 10px;
+    z-index: 10;
 }
 
 main div.temp-mark-content {
@@ -100,7 +101,7 @@ main div.temp-mark-content img {
     height: inherit;
 }
 
-section.video-visualizer input.temp-button {
+section.video-visualizer input.select-video-btn {
     padding: 15px 25px;
     background-color: var(--color3);
     color: var(--white);
@@ -109,7 +110,7 @@ section.video-visualizer input.temp-button {
 }
 
 @media screen and (max-width: 600px) {
-    header, 
+    header,
     header nav > ul.anchors {
         display: flex;
         flex-direction: column;
@@ -118,6 +119,6 @@ section.video-visualizer input.temp-button {
 
     ul.anchors li {
         display: flex;
-        justify-content: center;   
+        justify-content: center;
     }
 }

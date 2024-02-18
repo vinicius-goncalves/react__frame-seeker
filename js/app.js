@@ -1,7 +1,12 @@
-import { AnimationsManager, CustomFrame, VideoDetails } from './classes.js';
+import { AnimationsManager, Mark, VideoDetails } from './classes.js'
+import { createVideoElement } from './utils/dom-manipulation.js'
 
 const worker = {
     ref: null
+}
+
+const scriptPaths = {
+    'dom-manipulation': './js/utils/dom-manipulation.js'
 }
 
 ;(() => {
@@ -9,9 +14,19 @@ const worker = {
     worker.ref = new Worker('js/workers/frames-processor.js')
     worker.ref.postMessage('Worker initialized')
 
+    Object.entries(scriptPaths).forEach(([ file, path ]) => {
+
+        const script = document.createElement('script')
+        script.dataset.id = file
+        script.type = 'module'
+        script.src = path
+
+        const body = document.querySelector('body')
+        body.insertAdjacentElement('beforeend', script)
+
+    })
 })()
 
-const video = document.querySelector('video')
 const animationsManager = new AnimationsManager()
 
 async function extractFrames(DOMVideo) {
@@ -25,8 +40,6 @@ async function extractFrames(DOMVideo) {
         const { ['ref']: workerRef } = worker
 
         function startEvents() {
-
-            // video.currentTime = 5.4
 
             console.log('Starting')
 
@@ -57,13 +70,13 @@ async function extractFrames(DOMVideo) {
                     }))
 
                     if(!frame.exists) {
-                        
+
                         context.drawImage(DOMVideo, 0, 0, canvas.width, canvas.height)
                         const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: .5 })
                         workerRef.postMessage({ do: 'add-frame', item: { id: videoDetails.id, frame: blob } })
 
                     }
-                    
+
                     const currentAnimation = requestAnimationFrame(invokeFrame)
                     animationsManager.add(currentAnimation)
 
@@ -78,8 +91,6 @@ async function extractFrames(DOMVideo) {
             const triggersAnimationFrame = ['seeked', 'pause', 'ended', 'emptied']
             triggersAnimationFrame.forEach(action => {
                 DOMVideo.addEventListener(action, async () => {
-
-                    // animationsManager.stopAll()
 
                     if(DOMVideo.currentTime >= DOMVideo.duration) {
                         resolve({ finished: true, message: 'All frames were loaded.'})
@@ -97,7 +108,7 @@ async function extractFrames(DOMVideo) {
     if(res.finished) {
 
         worker.ref.postMessage({ do: 'get-all-frames' })
-        
+
         const allFrames = new Promise(resolve => {
             worker.ref.addEventListener('message', (event) => {
                 if(event.data.action_result === 'get-all-frames') {
@@ -110,9 +121,9 @@ async function extractFrames(DOMVideo) {
     }
 }
 
-const tempButton = document.querySelector('input.temp-button')
+const selectVideoBtn = document.querySelector('input.select-video-btn')
 
-function handleWithInputFile() {
+function loadLocalFile() {
 
     return new Promise(resolve => {
 
@@ -129,91 +140,66 @@ function handleWithInputFile() {
     })
 }
 
-tempButton.addEventListener('click', () => {
+function startVideoEvents(externalVideo) {
 
-    handleWithInputFile().then(async blobFile => {
+    const tempMark = new Mark()
 
-        const internalVideo = document.createElement('video')
-        internalVideo.width = 1000
-        internalVideo.height = 600
-        internalVideo.preload = 'auto'
-        internalVideo.src = URL.createObjectURL(blobFile)
+    function seekingForFrame(event) {
 
-        const clonedInternalVideo = internalVideo.cloneNode(true)
-        clonedInternalVideo.controls = true
-        tempButton.replaceWith(clonedInternalVideo)
+        const pageX = event.pageX
+        const offsetY = event.offsetY, offsetX = event.offsetX
 
-        clonedInternalVideo.addEventListener('seeking', () => {
-            worker.ref.postMessage({ do: 'get-all-frames' })
-        })
-
-        const tempMark = new Mark()
-
-        const mouseEventUtils = {
-            mouseCoords: { 
-                x: 0, 
-                y: 0
-            },
-            other: {
-                last_second: 0
-            }
+        if(!(offsetY >= externalVideo.height - (150 / 2)) || offsetX < 15 || offsetX >= externalVideo.width - 15) {
+            tempMark.remove()
+            return
         }
 
-        function updateCurrentFrame(frames, currentSeconds) {
+        const secondsConversion = (event.offsetX / externalVideo.offsetWidth) * externalVideo.duration
+        const lastSeconds = Math.abs(secondsConversion).toFixed(1)
 
-            const framesValues = frames.reduce((acc, item) => (acc.push(Object.values(item)), acc), [])
-            const frameFound = framesValues.find(([ id ]) => id === currentSeconds.toFixed(1))
-        
-            if(!frameFound) {
-                console.info('Not exists yet')
-                return 
-            }
+        const ref = tempMark.addIntoDOM()
+        tempMark.updateCoords(pageX - (ref.offsetWidth / 2), externalVideo.height - (150 / 2))
 
-            const [ , blob ] = frameFound
-            tempMark.updateImage(URL.createObjectURL(blob))
+        worker.ref.postMessage({ do: 'get-frame-by-seconds', item: { lastSeconds } })
+    }
+
+    const getAllFramesEvents = ['seeking', 'mousemove']
+
+    getAllFramesEvents.forEach((event) =>
+        externalVideo.addEventListener(event, seekingForFrame))
+
+    worker.ref.addEventListener('message', (event) => {
+
+        const { data } = event, { action_result } = data
+
+        if(action_result !== 'get-frame-by-seconds') {
+            return
         }
 
-        worker.ref.addEventListener('message', (event) => {
+        const { res } = data, { exists, frameFound } = res
 
-            const { data } = event
-            
-            if(data.action_result === 'get-all-frames') {
+        if(!exists) {
+            console.info('Frame did not found')
+            return
+        }
 
-                const { last_second } = mouseEventUtils.other
-                updateCurrentFrame(data.res, last_second)
+        const frameObjectURL = URL.createObjectURL(frameFound.frame)
+        tempMark.updateImage(frameObjectURL)
 
-            }
-        })
-        
-        clonedInternalVideo.addEventListener('mousemove', (event) => {
-            
-            const { mouseCoords } = mouseEventUtils
-
-            const clonedInternalVideoRect = clonedInternalVideo.getBoundingClientRect()
-            mouseCoords.x = event.pageX - clonedInternalVideoRect.left
-            mouseCoords.y = event.pageY - clonedInternalVideoRect.top
-
-            const lastSeconds = 
-                (mouseCoords.x / clonedInternalVideoRect.width) * clonedInternalVideo.duration
-
-            mouseEventUtils.other.last_second = lastSeconds
-
-            worker.ref.postMessage({ do: 'get-all-frames' })
-
-            if(!(mouseCoords.y >= clonedInternalVideo.height - 30)) {
-                tempMark.remove()
-                return
-            }
-
-            const element = tempMark.addIntoDOM()
-            tempMark
-                .updateCoords(mouseCoords.x - (element.offsetWidth / 2.5), clonedInternalVideoRect.height - 30)
-            
-        })
-
-        extractFrames(internalVideo).then(workerFramesMessage => {
-            console.log(workerFramesMessage)
-
-        })
     })
-})
+}
+
+async function startFrameSeeker() {
+
+    const blobFile = await loadLocalFile()
+
+    const hiddenVideo = createVideoElement(blobFile)
+    extractFrames(hiddenVideo).then((res) => console.info(res))
+
+    const externalVideo = hiddenVideo.cloneNode(true)
+    selectVideoBtn.replaceWith(externalVideo)
+
+    startVideoEvents(externalVideo)
+}
+
+selectVideoBtn.addEventListener('click', startFrameSeeker)
