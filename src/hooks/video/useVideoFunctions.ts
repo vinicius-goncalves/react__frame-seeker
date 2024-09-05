@@ -1,14 +1,14 @@
 import { useVideoContext } from './useVideoContext';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-interface MediaStreamHTMLVideoElement extends HTMLVideoElement {
+interface MediaStreamVideoElement extends HTMLVideoElement {
     captureStream(): MediaStream;
 }
 
 export function useVideoFunctions() {
     const { videoRef } = useVideoContext();
 
-    const video = videoRef.current as MediaStreamHTMLVideoElement;
+    const video = videoRef.current as MediaStreamVideoElement;
 
     const getVideoSettings = () => {
         const [track] = video.captureStream().getVideoTracks();
