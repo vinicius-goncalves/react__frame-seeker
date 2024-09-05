@@ -2,6 +2,8 @@
 
 Seeker for frame by frame in your video using this app
 
+![][project-banner]
+
 <div>
 
   ## Introdution
@@ -51,7 +53,7 @@ Seeker for frame by frame in your video using this app
 
 [comment]: # (assets-path)
 
-[project-banner]: <https://github.com/vinicius-goncalves/react__weather-app/blob/development/github/assets/project-banner.jpg> "Project banner"
+[project-banner]: <https://github.com/vinicius-goncalves/projects/blob/main/assets/frame-seeker/project-banner.jpg> "Project banner"
 [typescript]: <https://img.shields.io/badge/TypeScript-323330?style=for-the-badge&logo=typescript&logoColor=3077C5> "TypeScript"
 [react]: <https://img.shields.io/badge/React-323330?style=for-the-badge&logo=React> "React"
 [tailwind]: <https://img.shields.io/badge/Tailwind-323330?style=for-the-badge&logo=TailwindCSS> "Tailwind"
