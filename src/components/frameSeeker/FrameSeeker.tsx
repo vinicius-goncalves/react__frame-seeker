@@ -68,7 +68,13 @@ function FrameSeeker(): JSX.Element {
                 const frameIndex = calculeFrameIndex(ev);
                 const currWidth = (frameIndex / frames.length) * 100;
 
-                updateSeekerDetails({ posX: posX + 15, posY, currFramePos: frameIndex, currWidth });
+                updateSeekerDetails({
+                    posX: posX + 15,
+                    posY,
+                    currFramePos: frameIndex,
+                    currWidth,
+                    lastClickFramePos: frameIndex,
+                });
                 goToDOMFrame(frameIndex);
             });
         },
@@ -79,7 +85,11 @@ function FrameSeeker(): JSX.Element {
         return updateBar(ev, (clickRatioX, { barContext }) => {
             const { posX, posY } = handleSeekerPosition(clickRatioX, barContext);
             const frameIndex = calculeFrameIndex(ev);
-            updateSeekerDetails({ posX: posX + 15, posY, currFramePos: frameIndex });
+            updateSeekerDetails({
+                posX: posX + 15,
+                posY,
+                currFramePos: frameIndex,
+            });
         });
     };
 
