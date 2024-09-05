@@ -1,0 +1,11 @@
+{
+    "tabWidth": 4,
+    "printWidth": 115,
+    "singleQuote": true,
+    "semi": true,
+    "plugins": ["prettier-plugin-tailwindcss"],
+    "singleAttributePerLine": false,
+
+    "tailwindConfig": "./tailwind.config.js",
+    "tailwindFunctions": ["tv"]
+}

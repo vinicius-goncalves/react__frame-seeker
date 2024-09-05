@@ -1,0 +1,1 @@
+export { convertToPercentage } from './convertToPercentage';
